@@ -1,0 +1,141 @@
+
+
+<!DOCTYPE html>
+<html>
+	<head>
+		    <meta charset="utf-8">
+		        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+			    <title>舌诊荐餐</title>
+			        <link rel="stylesheet" href="https://s.myfoodth.com/test/tongue/layui/css/layui.css">
+				    <link rel="stylesheet" href="https://s.myfoodth.com/test/tongue/layui/css/tongue.css">
+            <script src="https://s.myfoodth.com/backend/js/jquery-2.1.1.js"></script>
+
+            <style>
+              video {
+                position: absolute;
+                top: 0;
+              }
+              .photos-mask {
+                position: relative;
+                height: 400px;
+              }
+              .image1 {
+                position: absolute;
+                top: 0;
+                z-index: 2;
+              }
+            </style>
+	</head>
+
+	<body>
+		<div class="container">
+			    <div class="camera-icon"><img alt="image" style="width: 50px;padding: 8px;" src="https://s.myfoodth.com/test/tongue/imgs/logo-home.svg"></div>
+			        <p class="compna">知吾AI舌诊餐荐</p>
+				    <p class="instructions">拍摄时，请注意以下几点：</p>
+				        <ul class="instruction">
+						        <li class="item"><i class="layui-icon layui-icon-chrome"></i> 将舌头完全放在拍摄区域</li>
+							        <li class="item"><i class="layui-icon layui-icon-light"></i> 保证光线充足且无逆光、曝光或反光</li>
+								        <li class="item"><i class="layui-icon layui-icon-water"></i> 确保舌头干净整洁没有异物和异色</li>
+									    </ul>
+									        <div class="photos">
+											        <li class="photos-mask">
+                                <img alt="image" src="https://s.myfoodth.com/test/tongue/imgs/mask.png" class="image1">
+                                <!-- <span>未找到摄像头</span> -->
+                                <video id="video" width="400" height="300" autoplay id="video">
+                                  <!-- <source src="https://www.w3school.com.cn/i/video/shanghai.mp4" type="video/mp4"> -->
+                                </video>
+                                <canvas id="canvas" width="400" height="300" style="position: absolute;opacity: 0;"></canvas>
+                              </li>
+												        <li class="photos-tongue"><img alt="image" src="https://s.myfoodth.com/test/tongue/imgs/tongue.jpg"></li>
+													    </div>
+													        <div class="photobar">
+															        <!-- <form action="tongue.php" method="post" enctype="multipart/form-data" class="layui-hide">
+																	        <input type="file" accept="image/*" class="layui-hide" id="imageInput" name="image" multiple>
+																		        </form> -->
+																			        <li class="photoact"><label for="imageInput"><i class="layui-icon layui-icon-camera-fill" style="font-size: 70px!important;"></i></label></li>
+																				        <li class="phototur"><i class="layui-icon layui-icon-refresh-1" style="font-size: 32px!important;"></i></li>
+																					    </div>
+		</div>
+		<!-- body 末尾处引入 layui -->
+		<script src="https://s.myfoodth.com/test/tongue/layui/layui.js"></script>
+		<script>
+			    document.getElementById('imageInput').addEventListener('change', function (event) {
+							            const file = document.getElementById('imageInput').files[0]
+							            if (file) {
+												                // const reader = new FileReader()
+												                // reader.onload = function (e) {
+																		            //     const img = document.getElementById('preview')
+																		            //     img.src = e.target.result
+																		            //     img.style.display = 'block'
+																		            // }
+												                // reader.readAsDataURL(file)
+												                document.forms[0].submit()
+												            }
+							        });
+
+                      
+		</script>
+    <script>
+      const video = document.getElementById('video');
+     
+      // 检测摄像头设备是否可用
+      if (navigator.mediaDevices.getUserMedia) {
+        // 指定视频来源为前置摄像头
+        const constraints = {
+          video: { facingMode: { exact: "user" } }
+        };
+     
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then(function(stream) {
+            // 成功则将视频流设置为<video>元素的源
+            video.srcObject = stream;
+          })
+          .catch(function(err) {
+            alert('摄像头访问错误')
+            console.error("摄像头访问错误:", err);
+          });
+      } else {
+        alert("不幸的是，你的浏览器不支持getUserMedia");
+      }
+     
+      $('.photoact').on('click',function(){
+            let video = document.getElementById("video");
+            video.pause()
+            let canvas = document.getElementById("canvas");
+            let ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, 400, 300);
+            // console.log(canvas.toDataURL('image/jpeg'))
+            var idx = 0;
+            layui.use(['jquery', 'layer'], function () {
+                    var layer = layui.layer;
+                    idx = layer.msg("识别中...", {
+                        icon: 16
+                        , shade: 0.01
+                        , skin: 'layui-layer-lan'
+                        , time: 0
+                        , btn: []
+                        
+                    });
+            })
+            canvas.toBlob(function (blobObj) {
+              var fd = new FormData();
+              fd.append('image', blobObj);
+              $.ajax({
+                url: 'tongue.php', // 替换为你的上传脚本URL
+                type: 'POST',
+                data: fd,
+                contentType: false, // 防止jQuery修改contentType
+                processData: false, // 防止jQuery处理data成字符串
+                success: function(response){
+                  alert(response)
+                  layer.close(idx)
+                },
+              })
+              
+
+            })
+      })
+    </script>
+	</body>
+</html>
+
