@@ -32,7 +32,7 @@
   <div class="container">
     <div class="camera-icon"><img alt="image" style="width: 50px;padding: 8px;"
         src="https://s.myfoodth.com/test/tongue/imgs/logo-home.svg"></div>
-    <p class="compna">知吾AI舌诊餐荐11111</p>
+    <p class="compna">知吾AI舌诊餐荐</p>
     <p class="instructions">拍摄时，请注意以下几点：</p>
     <ul class="instruction">
       <li class="item"><i class="layui-icon layui-icon-chrome"></i> 将舌头完全放在拍摄区域</li>
@@ -92,6 +92,7 @@
         .then(function (stream) {
           // 成功则将视频流设置为<video>元素的源
           video.srcObject = stream;
+          video.play();
         })
         .catch(function (err) {
           alert('摄像头访问错误')
